@@ -59,7 +59,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.compose.foundation:foundation:1.6.0") // or latest stable
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.runtime.livedata) // or latest stable
+    implementation(libs.gson)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
 
 
     // Test impl
