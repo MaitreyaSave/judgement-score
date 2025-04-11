@@ -62,7 +62,7 @@ fun GameScreen(
     // Map of round index to bet values (Player -> bet amount)
     var betAmounts by remember { mutableStateOf<Map<Int, Map<Player, Int>>>(emptyMap()) }
     var showBetAmountDialog by remember { mutableStateOf(false) }
-    var currentBetRow by remember { mutableIntStateOf(-1) }
+    var currentBetRow by remember { mutableIntStateOf(0) }
 
     // Winner selection dialog state
     var showWinnerDialog by remember { mutableStateOf(false) }
@@ -74,16 +74,11 @@ fun GameScreen(
         }
     }
 
-    // Update players to store their bet values (if needed).
-//    fun updateBetsInPlayers(betValues: Map<Player, Int>) {
-//        selectedPlayers = selectedPlayers.map { player ->
-//            player.copy(bet = betValues[player] ?: 0)
-//        }
-//    }
 
     // Proceed to the next round (active round index).
     fun proceedToNextRow() {
         currentBetRow++
+        buttonRowIndex++
     }
 
     // Proceed to next player slot when picking players (if applicable).
@@ -182,7 +177,6 @@ fun GameScreen(
                             Button(
                                 onClick = {
                                     showBetAmountDialog = true
-                                    currentBetRow = rowIndex
                                 },
                                 modifier = Modifier.width(buttonCellSize)
                             ) {
@@ -301,7 +295,6 @@ fun GameScreen(
                 initialBets = betAmounts[currentBetRow] ?: emptyMap(),
                 onSaveBets = { betValues ->
                     updateBetAmountsForRow(currentBetRow, betValues)
-//                    updateBetsInPlayers(betValues)
                     showBetAmountDialog = false
                     // Optionally, you can call a function here to automatically move to the next row.
                 },
@@ -329,7 +322,7 @@ fun GameScreen(
                     }
                     showWinnerDialog = false
                     // Move to the next active row, if applicable.
-                    buttonRowIndex++
+                    proceedToNextRow()
                 }
             )
         }
