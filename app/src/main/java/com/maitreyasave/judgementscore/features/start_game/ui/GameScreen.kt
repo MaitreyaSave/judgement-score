@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -26,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.maitreyasave.judgementscore.features.add_bet.BetAmountDialog
 import com.maitreyasave.judgementscore.features.add_player.PlayerViewModel
 import com.maitreyasave.judgementscore.features.add_player.PlayerViewModelFactory
 import com.maitreyasave.judgementscore.features.add_player.data.Player
@@ -48,6 +50,23 @@ fun GameScreen(
 
     val scrollState = rememberScrollState()
 
+    // State to manage the button position (either in the first row or second row)
+    var buttonRowIndex by remember { mutableIntStateOf(0) }
+
+    // State to track bet amounts for each player in the current row
+    var betAmounts by remember { mutableStateOf<Map<Int, Map<Player, Int>>>(emptyMap()) }
+    var showBetAmountDialog by remember { mutableStateOf(false) }
+    var currentBetRow by remember { mutableStateOf(-1) }
+
+    fun updateBetAmountsForRow(rowIndex: Int, betValues: Map<Player, Int>) {
+        betAmounts = betAmounts.toMutableMap().apply {
+            put(rowIndex, betValues)
+        }
+    }
+
+    fun proceedToNextRow() {
+        currentBetRow++
+    }
 
     fun proceedToNextPlayer(currentIndex: Int) {
         showPlayerPickerIndex = if (currentIndex + 1 < numberOfPlayers) {
@@ -63,6 +82,7 @@ fun GameScreen(
             .verticalScroll(scrollState)
             .padding(24.dp)
     ) {
+        // Row for buttons (Set Number of Players, Start Game)
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
@@ -87,9 +107,9 @@ fun GameScreen(
             }
         }
 
+        // When the game has started, show the grid
         if (gameStarted && numberOfRounds > 0) {
-            val suits = listOf("♠️", "♥️", "♣️", "♦️", "⬜") // blank = ⬜ for clarity
-            selectedPlayers.size + 1
+            val suits = listOf("♠️", "♥️", "♣️", "♦️", "⬜") // suit symbols
 
             Column(
                 modifier = Modifier
@@ -106,6 +126,7 @@ fun GameScreen(
                             maxLines = 1
                         )
                     }
+                    Text("Bet/Next", modifier = Modifier.weight(1f))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -120,17 +141,36 @@ fun GameScreen(
                                 .weight(1f)
                                 .padding(start = 16.dp)
                         )
-                        repeat(selectedPlayers.size) {
-                            Text("-", modifier = Modifier.weight(1f)) // Placeholder for score
+
+                        // Display the bet values from betAmounts
+                        selectedPlayers.forEach { player ->
+                            val bet = betAmounts[rowIndex]?.get(player) ?: 0
+                            Text("$bet", modifier = Modifier.weight(1f)) // Display bet value
                         }
+
+                        // Button that will be placed in the last column of the specific row
+                        if (rowIndex == buttonRowIndex) {
+                            Button(
+                                onClick = {
+                                    showBetAmountDialog = true
+                                    currentBetRow = rowIndex
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Bet")
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+
                     }
                 }
             }
         }
 
-
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Show selected players below
         if (selectedPlayers.isNotEmpty()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -212,6 +252,18 @@ fun GameScreen(
             )
         }
 
-
+        // Bet Amount Dialog
+        if (showBetAmountDialog) {
+            BetAmountDialog(
+                players = selectedPlayers,
+                onSaveBets = { betValues ->
+                    // Update bet amounts for the current row
+                    updateBetAmountsForRow(currentBetRow, betValues)
+                    proceedToNextRow()  // Move to the next row after confirming the bet
+                    showBetAmountDialog = false
+                },
+                onDismiss = { showBetAmountDialog = false }
+            )
+        }
     }
 }
