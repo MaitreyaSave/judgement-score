@@ -33,6 +33,7 @@ import com.maitreyasave.judgementscore.features.add_bet.BetAmountDialog
 import com.maitreyasave.judgementscore.features.add_player.PlayerViewModel
 import com.maitreyasave.judgementscore.features.add_player.PlayerViewModelFactory
 import com.maitreyasave.judgementscore.features.add_player.data.Player
+import com.maitreyasave.judgementscore.features.select_winner.WinnerSelectionDialog
 
 @Composable
 fun GameScreen(
@@ -62,9 +63,20 @@ fun GameScreen(
     var showBetAmountDialog by remember { mutableStateOf(false) }
     var currentBetRow by remember { mutableStateOf(-1) }
 
+    //
+    var showWinnerDialog by remember { mutableStateOf(false) }
+    var selectedWinners by remember { mutableStateOf<Set<Player>>(emptySet()) }
+
+
     fun updateBetAmountsForRow(rowIndex: Int, betValues: Map<Player, Int>) {
         betAmounts = betAmounts.toMutableMap().apply {
             put(rowIndex, betValues)
+        }
+    }
+
+    fun updateBetsInPlayers(betValues: Map<Player, Int>) {
+        selectedPlayers = selectedPlayers.map { player ->
+            player.copy(bet = betValues[player] ?: 0)
         }
     }
 
@@ -180,7 +192,7 @@ fun GameScreen(
 
                             Button(
                                 onClick = {
-                                    //
+                                    showWinnerDialog = true
                                 },
                                 modifier = Modifier.width(buttonCellSize)
                             ) {
@@ -205,7 +217,7 @@ fun GameScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 selectedPlayers.forEach { player ->
-                    Text("${player.emoji} ${player.name}")
+                    Text("${player.emoji} ${player.name}: ${player.score}")
                 }
             }
         }
@@ -289,8 +301,30 @@ fun GameScreen(
                     updateBetAmountsForRow(currentBetRow, betValues)
                     proceedToNextRow()
                     showBetAmountDialog = false
+                    updateBetsInPlayers(betValues)
                 },
                 onDismiss = { showBetAmountDialog = false }
+            )
+        }
+
+        // Winner selection Dialog
+        if (showWinnerDialog) {
+            WinnerSelectionDialog(
+                players = selectedPlayers,
+                onDismiss = { showWinnerDialog = false },
+                onFinish = { winners ->
+                    selectedPlayers = selectedPlayers.map { player ->
+                        val comboScore = player.bet + 10
+                        val finalScore = if (player in winners) {
+                            player.score + comboScore
+                        } else {
+                            player.score - comboScore
+                        }
+                        player.copy(score = finalScore)
+                    }
+                    showWinnerDialog = false
+                    proceedToNextRow()
+                }
             )
         }
 
