@@ -39,14 +39,15 @@ import com.maitreyasave.judgementscore.features.select_winner.WinnerSelectionDia
 fun GameScreen(
     playerViewModel: PlayerViewModel = viewModel(factory = PlayerViewModelFactory(LocalContext.current))
 ) {
-    val allPlayers by playerViewModel.players
+    // These states come from your existing PlayerViewModel or your own source.
+    // For this example, we assume selectedPlayers are managed locally.
     var numberOfPlayers by remember { mutableStateOf(0) }
     var selectedPlayers by remember { mutableStateOf<List<Player>>(emptyList()) }
 
     var showNumberDialog by remember { mutableStateOf(false) }
     var showPlayerPickerIndex by remember { mutableStateOf<Int?>(null) }
 
-    // Grid logic
+    // Grid/Game logic state kept directly in GameScreen:
     var gameStarted by remember { mutableStateOf(false) }
     var numberOfRounds by remember { mutableStateOf(0) }
     var showRoundsDialog by remember { mutableStateOf(false) }
@@ -55,35 +56,37 @@ fun GameScreen(
     val suitCellSize = 40.dp
     val buttonCellSize = 100.dp
 
-    // State to manage the button position (either in the first row or second row)
+    // Which row is currently active for showing the "Bet" button
     var buttonRowIndex by remember { mutableIntStateOf(0) }
 
-    // State to track bet amounts for each player in the current row
+    // Map of round index to bet values (Player -> bet amount)
     var betAmounts by remember { mutableStateOf<Map<Int, Map<Player, Int>>>(emptyMap()) }
     var showBetAmountDialog by remember { mutableStateOf(false) }
     var currentBetRow by remember { mutableStateOf(-1) }
 
-    //
+    // Winner selection dialog state
     var showWinnerDialog by remember { mutableStateOf(false) }
-    var selectedWinners by remember { mutableStateOf<Set<Player>>(emptySet()) }
 
-
+    // Helper function: update bet amounts for a given round.
     fun updateBetAmountsForRow(rowIndex: Int, betValues: Map<Player, Int>) {
         betAmounts = betAmounts.toMutableMap().apply {
             put(rowIndex, betValues)
         }
     }
 
+    // Update players to store their bet values (if needed).
     fun updateBetsInPlayers(betValues: Map<Player, Int>) {
         selectedPlayers = selectedPlayers.map { player ->
             player.copy(bet = betValues[player] ?: 0)
         }
     }
 
+    // Proceed to the next round (active round index).
     fun proceedToNextRow() {
         currentBetRow++
     }
 
+    // Proceed to next player slot when picking players (if applicable).
     fun proceedToNextPlayer(currentIndex: Int) {
         showPlayerPickerIndex = if (currentIndex + 1 < numberOfPlayers) {
             currentIndex + 1
@@ -98,7 +101,7 @@ fun GameScreen(
             .verticalScroll(scrollState)
             .padding(24.dp)
     ) {
-        // Row for buttons (Set Number of Players, Start Game)
+        // Top buttons: Set number of players, Start game
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
@@ -110,7 +113,6 @@ fun GameScreen(
             ) {
                 Text("Set Number of Players")
             }
-
             Button(
                 onClick = {
                     gameStarted = true
@@ -123,7 +125,7 @@ fun GameScreen(
             }
         }
 
-        // When the game has started, show the grid
+        // Grid: Display rounds if game started and rounds are set.
         if (gameStarted && numberOfRounds > 0) {
             val suits = listOf("♠️", "♥️", "♣️", "♦️", "⬜") // suit symbols
 
@@ -147,38 +149,35 @@ fun GameScreen(
                             maxLines = 1
                         )
                     }
-                    Text("Bet", modifier = Modifier.width(buttonCellSize))
-                    Text("Next", modifier = Modifier.width(buttonCellSize))
+                    Text("Bet", modifier = Modifier.width(buttonCellSize), textAlign = TextAlign.Center)
+                    Text("Next", modifier = Modifier.width(buttonCellSize), textAlign = TextAlign.Center)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Rounds Grid
+                // Rounds Grid: For each round, display suit and bet values, and show buttons in the active row.
                 for (rowIndex in 0 until numberOfRounds) {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // First column = suits (cycled)
+                        // Suit column for this round.
                         Text(
                             text = suits[rowIndex % suits.size],
                             modifier = Modifier
                                 .width(suitCellSize)
-                                .padding(start = 16.dp)
+                                .padding(start = 16.dp),
+                            textAlign = TextAlign.Center
                         )
-
-                        // Display the bet values from betAmounts
+                        // For each player, display the bet value from betAmounts; default to 0.
                         selectedPlayers.forEach { player ->
-                            val bet = betAmounts[rowIndex]?.get(player) ?: 0
+//                            val bet = betAmounts[rowIndex]?.get(player) ?: 0
                             Text(
-                                text = "$bet",
-                                modifier = Modifier
-                                    .weight(1f),
+                                text = "${player.bet}",
+                                modifier = Modifier.weight(1f),
                                 maxLines = 1,
-                                // Center-align the text
                                 softWrap = false,
                                 textAlign = TextAlign.Center
                             )
                         }
-
-                        // Button that will be placed in the last column of the specific row
+                        // Place active row buttons only in the row matching buttonRowIndex.
                         if (rowIndex == buttonRowIndex) {
                             Button(
                                 onClick = {
@@ -189,20 +188,17 @@ fun GameScreen(
                             ) {
                                 Text("Bet")
                             }
-
                             Button(
-                                onClick = {
-                                    showWinnerDialog = true
-                                },
+                                onClick = { showWinnerDialog = true },
                                 modifier = Modifier.width(buttonCellSize)
                             ) {
                                 Text("Next")
                             }
                         } else {
+                            // Fixed width spacers to preserve layout.
                             Spacer(modifier = Modifier.width(buttonCellSize))
                             Spacer(modifier = Modifier.width(buttonCellSize))
                         }
-
                     }
                 }
             }
@@ -210,19 +206,25 @@ fun GameScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Show selected players below
+        // Display selected players and their scores/bet data.
         if (selectedPlayers.isNotEmpty()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 selectedPlayers.forEach { player ->
-                    Text("${player.emoji} ${player.name}: ${player.score}")
+                    Text(
+                        text = "${player.emoji} ${player.name}: ${player.score}\nScore: ${player.score}",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
 
-        // Dialog to set number of players
+        // --- Dialogs below ---
+
+        // Set number of players dialog.
         if (showNumberDialog) {
             SetNumberOfPlayersDialog(
                 onDismiss = { showNumberDialog = false },
@@ -235,10 +237,10 @@ fun GameScreen(
             )
         }
 
-        // Player picker for each slot
+        // Player picker dialog.
         showPlayerPickerIndex?.let { index ->
             PlayerPickerDialog(
-                allPlayers = allPlayers,
+                allPlayers = playerViewModel.players.value,  // or allPlayers if you want to use local state.
                 selectedPlayers = selectedPlayers,
                 onAddNew = { name, emoji ->
                     val newPlayer = Player(name, emoji)
@@ -258,7 +260,7 @@ fun GameScreen(
             )
         }
 
-        // Number of rounds
+        // Set number of rounds dialog.
         if (showRoundsDialog) {
             var input by remember { mutableStateOf("") }
 
@@ -292,41 +294,43 @@ fun GameScreen(
             )
         }
 
-        // Bet Amount Dialog
+        // Bet Amount Dialog with previous bet values loaded.
         if (showBetAmountDialog) {
             BetAmountDialog(
                 players = selectedPlayers,
                 initialBets = betAmounts[currentBetRow] ?: emptyMap(),
                 onSaveBets = { betValues ->
                     updateBetAmountsForRow(currentBetRow, betValues)
-                    proceedToNextRow()
-                    showBetAmountDialog = false
                     updateBetsInPlayers(betValues)
+                    showBetAmountDialog = false
+                    // Optionally, you can call a function here to automatically move to the next row.
                 },
                 onDismiss = { showBetAmountDialog = false }
             )
         }
 
-        // Winner selection Dialog
+        // Winner selection Dialog.
         if (showWinnerDialog) {
             WinnerSelectionDialog(
                 players = selectedPlayers,
                 onDismiss = { showWinnerDialog = false },
                 onFinish = { winners ->
                     selectedPlayers = selectedPlayers.map { player ->
-                        val comboScore = player.bet + 10
-                        val finalScore = if (player in winners) {
-                            player.score + comboScore
+                        // Example scoring logic: add bet + bonus for winners, subtract for non-winners.
+                        val betValue = player.bet
+                        val bonus = 10
+                        val newScore = if (player in winners) {
+                            player.score + betValue + bonus
                         } else {
-                            player.score - comboScore
+                            player.score - (betValue + bonus)
                         }
-                        player.copy(score = finalScore)
+                        player.copy(score = newScore)
                     }
                     showWinnerDialog = false
-                    proceedToNextRow()
+                    // Move to the next active row, if applicable.
+                    buttonRowIndex++
                 }
             )
         }
-
     }
 }
