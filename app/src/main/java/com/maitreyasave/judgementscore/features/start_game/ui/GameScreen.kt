@@ -41,7 +41,7 @@ fun GameScreen(
 ) {
     // These states come from your existing PlayerViewModel or your own source.
     // For this example, we assume selectedPlayers are managed locally.
-    var numberOfPlayers by remember { mutableStateOf(0) }
+    var numberOfPlayers by remember { mutableIntStateOf(0) }
     var selectedPlayers by remember { mutableStateOf<List<Player>>(emptyList()) }
 
     var showNumberDialog by remember { mutableStateOf(false) }
@@ -49,7 +49,7 @@ fun GameScreen(
 
     // Grid/Game logic state kept directly in GameScreen:
     var gameStarted by remember { mutableStateOf(false) }
-    var numberOfRounds by remember { mutableStateOf(0) }
+    var numberOfRounds by remember { mutableIntStateOf(0) }
     var showRoundsDialog by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
@@ -62,7 +62,7 @@ fun GameScreen(
     // Map of round index to bet values (Player -> bet amount)
     var betAmounts by remember { mutableStateOf<Map<Int, Map<Player, Int>>>(emptyMap()) }
     var showBetAmountDialog by remember { mutableStateOf(false) }
-    var currentBetRow by remember { mutableStateOf(-1) }
+    var currentBetRow by remember { mutableIntStateOf(-1) }
 
     // Winner selection dialog state
     var showWinnerDialog by remember { mutableStateOf(false) }
@@ -75,11 +75,11 @@ fun GameScreen(
     }
 
     // Update players to store their bet values (if needed).
-    fun updateBetsInPlayers(betValues: Map<Player, Int>) {
-        selectedPlayers = selectedPlayers.map { player ->
-            player.copy(bet = betValues[player] ?: 0)
-        }
-    }
+//    fun updateBetsInPlayers(betValues: Map<Player, Int>) {
+//        selectedPlayers = selectedPlayers.map { player ->
+//            player.copy(bet = betValues[player] ?: 0)
+//        }
+//    }
 
     // Proceed to the next round (active round index).
     fun proceedToNextRow() {
@@ -168,9 +168,9 @@ fun GameScreen(
                         )
                         // For each player, display the bet value from betAmounts; default to 0.
                         selectedPlayers.forEach { player ->
-//                            val bet = betAmounts[rowIndex]?.get(player) ?: 0
+                            val bet = betAmounts[rowIndex]?.get(player) ?: 0
                             Text(
-                                text = "${player.bet}",
+                                text = "$bet",
                                 modifier = Modifier.weight(1f),
                                 maxLines = 1,
                                 softWrap = false,
@@ -301,7 +301,7 @@ fun GameScreen(
                 initialBets = betAmounts[currentBetRow] ?: emptyMap(),
                 onSaveBets = { betValues ->
                     updateBetAmountsForRow(currentBetRow, betValues)
-                    updateBetsInPlayers(betValues)
+//                    updateBetsInPlayers(betValues)
                     showBetAmountDialog = false
                     // Optionally, you can call a function here to automatically move to the next row.
                 },
@@ -315,9 +315,10 @@ fun GameScreen(
                 players = selectedPlayers,
                 onDismiss = { showWinnerDialog = false },
                 onFinish = { winners ->
+                    val currentBets = betAmounts[currentBetRow]
                     selectedPlayers = selectedPlayers.map { player ->
                         // Example scoring logic: add bet + bonus for winners, subtract for non-winners.
-                        val betValue = player.bet
+                        val betValue = currentBets?.get(player) ?: 0
                         val bonus = 10
                         val newScore = if (player in winners) {
                             player.score + betValue + bonus
