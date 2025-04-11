@@ -60,7 +60,7 @@ fun GameScreen(
     var buttonRowIndex by remember { mutableIntStateOf(0) }
 
     // Map of round index to bet values (Player -> bet amount)
-    var betAmounts by remember { mutableStateOf<Map<Int, Map<Player, Int>>>(emptyMap()) }
+    var betAmounts by remember { mutableStateOf<Map<Int, Map<String, Int>>>(emptyMap()) }
     var showBetAmountDialog by remember { mutableStateOf(false) }
     var currentBetRow by remember { mutableIntStateOf(0) }
 
@@ -68,7 +68,7 @@ fun GameScreen(
     var showWinnerDialog by remember { mutableStateOf(false) }
 
     // Helper function: update bet amounts for a given round.
-    fun updateBetAmountsForRow(rowIndex: Int, betValues: Map<Player, Int>) {
+    fun updateBetAmountsForRow(rowIndex: Int, betValues: Map<String, Int>) {
         betAmounts = betAmounts.toMutableMap().apply {
             put(rowIndex, betValues)
         }
@@ -163,7 +163,7 @@ fun GameScreen(
                         )
                         // For each player, display the bet value from betAmounts; default to 0.
                         selectedPlayers.forEach { player ->
-                            val bet = betAmounts[rowIndex]?.get(player) ?: 0
+                            val bet = betAmounts[rowIndex]?.get(player.name) ?: 0
                             Text(
                                 text = "$bet",
                                 modifier = Modifier.weight(1f),
@@ -296,7 +296,6 @@ fun GameScreen(
                 onSaveBets = { betValues ->
                     updateBetAmountsForRow(currentBetRow, betValues)
                     showBetAmountDialog = false
-                    // Optionally, you can call a function here to automatically move to the next row.
                 },
                 onDismiss = { showBetAmountDialog = false }
             )
@@ -311,7 +310,7 @@ fun GameScreen(
                     val currentBets = betAmounts[currentBetRow]
                     selectedPlayers = selectedPlayers.map { player ->
                         // Example scoring logic: add bet + bonus for winners, subtract for non-winners.
-                        val betValue = currentBets?.get(player) ?: 0
+                        val betValue = currentBets?.get(player.name) ?: 0
                         val bonus = 10
                         val newScore = if (player in winners) {
                             player.score + betValue + bonus

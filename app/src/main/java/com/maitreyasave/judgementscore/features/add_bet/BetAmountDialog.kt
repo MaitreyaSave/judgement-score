@@ -18,16 +18,16 @@ import com.maitreyasave.judgementscore.features.add_player.data.Player
 @Composable
 fun BetAmountDialog(
     players: List<Player>,
-    initialBets: Map<Player, Int> = emptyMap(),
-    onSaveBets: (Map<Player, Int>) -> Unit,
+    initialBets: Map<String, Int> = emptyMap(),
+    onSaveBets: (Map<String, Int>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val betValues = remember { mutableStateMapOf<Player, String>() }
+    val betValues = remember { mutableStateMapOf<String, String>() }
 
     // Initialize the state with previous values or empty
     players.forEach { player ->
-        if (betValues[player] == null) {
-            betValues[player] = initialBets[player]?.toString() ?: ""
+        if (betValues[player.name] == null) {
+            betValues[player.name] = initialBets[player.name]?.toString() ?: ""
         }
     }
 
@@ -38,8 +38,8 @@ fun BetAmountDialog(
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 players.forEach { player ->
                     OutlinedTextField(
-                        value = betValues[player] ?: "",
-                        onValueChange = { betValues[player] = it },
+                        value = betValues[player.name] ?: "",
+                        onValueChange = { betValues[player.name] = it },
                         label = { Text("${player.name} Bet") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true
