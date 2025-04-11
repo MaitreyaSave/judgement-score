@@ -34,6 +34,14 @@ fun GameScreen(
     var showNumberDialog by remember { mutableStateOf(false) }
     var showPlayerPickerIndex by remember { mutableStateOf<Int?>(null) }
 
+    fun proceedToNextPlayer(currentIndex: Int) {
+        showPlayerPickerIndex = if (currentIndex + 1 < numberOfPlayers) {
+            currentIndex + 1
+        } else {
+            null
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,27 +81,20 @@ fun GameScreen(
         showPlayerPickerIndex?.let { index ->
             PlayerPickerDialog(
                 allPlayers = allPlayers,
+                selectedPlayers = selectedPlayers,
                 onAddNew = { name, emoji ->
                     val newPlayer = Player(name, emoji)
                     playerViewModel.addPlayer(name, emoji)
                     selectedPlayers = selectedPlayers.toMutableList().also {
                         it[index] = newPlayer
                     }
-                    if (index + 1 < numberOfPlayers) {
-                        showPlayerPickerIndex = index + 1
-                    } else {
-                        showPlayerPickerIndex = null
-                    }
+                    proceedToNextPlayer(index)
                 },
                 onSelect = { player ->
                     selectedPlayers = selectedPlayers.toMutableList().also {
                         it[index] = player
                     }
-                    if (index + 1 < numberOfPlayers) {
-                        showPlayerPickerIndex = index + 1
-                    } else {
-                        showPlayerPickerIndex = null
-                    }
+                    proceedToNextPlayer(index)
                 },
                 onDismiss = { showPlayerPickerIndex = null }
             )
