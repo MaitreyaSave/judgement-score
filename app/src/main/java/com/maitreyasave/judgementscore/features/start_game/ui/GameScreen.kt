@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -25,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maitreyasave.judgementscore.features.add_bet.BetAmountDialog
@@ -49,6 +51,8 @@ fun GameScreen(
     var showRoundsDialog by remember { mutableStateOf(false) }
 
     val scrollState = rememberScrollState()
+    val suitCellSize = 40.dp
+    val buttonCellSize = 100.dp
 
     // State to manage the button position (either in the first row or second row)
     var buttonRowIndex by remember { mutableIntStateOf(0) }
@@ -118,15 +122,21 @@ fun GameScreen(
             ) {
                 // Header Row
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Suit", modifier = Modifier.weight(1f))
+                    Text(
+                        text = "Suit",
+                        modifier = Modifier.width(suitCellSize),
+                        textAlign = TextAlign.Center
+                    )
                     selectedPlayers.forEach { player ->
                         Text(
                             text = "${player.emoji} ${player.name}",
                             modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center,
                             maxLines = 1
                         )
                     }
-                    Text("Bet/Next", modifier = Modifier.weight(1f))
+                    Text("Bet", modifier = Modifier.width(buttonCellSize))
+                    Text("Next", modifier = Modifier.width(buttonCellSize))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -138,14 +148,22 @@ fun GameScreen(
                         Text(
                             text = suits[rowIndex % suits.size],
                             modifier = Modifier
-                                .weight(1f)
+                                .width(suitCellSize)
                                 .padding(start = 16.dp)
                         )
 
                         // Display the bet values from betAmounts
                         selectedPlayers.forEach { player ->
                             val bet = betAmounts[rowIndex]?.get(player) ?: 0
-                            Text("$bet", modifier = Modifier.weight(1f)) // Display bet value
+                            Text(
+                                text = "$bet",
+                                modifier = Modifier
+                                    .weight(1f),
+                                maxLines = 1,
+                                // Center-align the text
+                                softWrap = false,
+                                textAlign = TextAlign.Center
+                            )
                         }
 
                         // Button that will be placed in the last column of the specific row
@@ -155,12 +173,22 @@ fun GameScreen(
                                     showBetAmountDialog = true
                                     currentBetRow = rowIndex
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.width(buttonCellSize)
                             ) {
                                 Text("Bet")
                             }
+
+                            Button(
+                                onClick = {
+                                    //
+                                },
+                                modifier = Modifier.width(buttonCellSize)
+                            ) {
+                                Text("Next")
+                            }
                         } else {
-                            Spacer(modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.width(buttonCellSize))
+                            Spacer(modifier = Modifier.width(buttonCellSize))
                         }
 
                     }
@@ -256,14 +284,15 @@ fun GameScreen(
         if (showBetAmountDialog) {
             BetAmountDialog(
                 players = selectedPlayers,
+                initialBets = betAmounts[currentBetRow] ?: emptyMap(),
                 onSaveBets = { betValues ->
-                    // Update bet amounts for the current row
                     updateBetAmountsForRow(currentBetRow, betValues)
-                    proceedToNextRow()  // Move to the next row after confirming the bet
+                    proceedToNextRow()
                     showBetAmountDialog = false
                 },
                 onDismiss = { showBetAmountDialog = false }
             )
         }
+
     }
 }

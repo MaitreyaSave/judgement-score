@@ -1,7 +1,6 @@
 package com.maitreyasave.judgementscore.features.add_bet
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -10,48 +9,50 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.maitreyasave.judgementscore.features.add_player.data.Player
 
 @Composable
 fun BetAmountDialog(
     players: List<Player>,
+    initialBets: Map<Player, Int> = emptyMap(),
     onSaveBets: (Map<Player, Int>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var betValues by remember { mutableStateOf<Map<Player, Int>>(emptyMap()) }
+    val betValues = remember { mutableStateMapOf<Player, String>() }
 
-    val scrollState = rememberScrollState()
+    // Initialize the state with previous values or empty
+    players.forEach { player ->
+        if (betValues[player] == null) {
+            betValues[player] = initialBets[player]?.toString() ?: ""
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Enter Bet Amounts") },
         text = {
-            // Make the Column scrollable
-            Column(modifier = Modifier.verticalScroll(scrollState)) {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 players.forEach { player ->
-                    var bet by remember { mutableStateOf("") }
                     OutlinedTextField(
-                        value = bet,
-                        onValueChange = { bet = it },
+                        value = betValues[player] ?: "",
+                        onValueChange = { betValues[player] = it },
                         label = { Text("${player.name} Bet") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        singleLine = true,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        singleLine = true
                     )
-                    betValues = betValues + (player to (bet.toIntOrNull() ?: 0))
                 }
             }
         },
         confirmButton = {
             TextButton(
-                onClick = { onSaveBets(betValues) }
+                onClick = {
+                    val result = betValues.mapValues { (_, value) -> value.toIntOrNull() ?: 0 }
+                    onSaveBets(result)
+                }
             ) {
                 Text("Save Bets")
             }
