@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("org.jetbrains.kotlin.kapt")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0" // match your Kotlin version
 }
 
 android {
@@ -70,8 +71,12 @@ dependencies {
     kapt(libs.androidx.room.compiler) // Required for annotation processing
 
     // Dagger
-    implementation("com.google.dagger:dagger:2.50")
-    kapt("com.google.dagger:dagger-compiler:2.50")
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
+
 
 
     // Test impl
