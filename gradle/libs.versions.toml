@@ -1,21 +1,20 @@
 [versions]
-agp = "8.9.0"
-dagger = "2.50"
-gson = "2.8.8"
-kotlin = "1.9.0"
-coreKtx = "1.15.0"
+agp = "8.9.3"
+dagger = "2.52"
+gson = "2.10.1"
+kotlin = "2.0.20"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-foundation = "1.7.8"
-kotlinxSerializationJson = "1.5.0"
-lifecycleRuntimeKtx = "2.8.7"
+foundation = "1.8.1"
+kotlinxSerializationJson = "1.7.1"
+lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2023.08.00"
-lifecycleViewmodelCompose = "2.6.2"
-protobufJavalite = "3.18.0"
-roomRuntime = "2.6.1"
-runtimeLivedata = "1.7.8"
+composeBom = "2025.05.00"
+lifecycleViewmodelCompose = "2.9.0"
+roomRuntime = "2.7.1"
+runtimeLivedata = "1.8.1"
 material3Android = "1.3.2"
 
 [libraries]
@@ -42,7 +41,6 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
-androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 [plugins]
