@@ -19,17 +19,20 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
     }
 
     private fun loadPlayers() {
-        _players.value = repository.loadPlayers()
+        viewModelScope.launch {
+            _players.value = repository.loadPlayers()
+        }
     }
 
     fun addPlayer(name: String, emoji: String) {
-        val newPlayer = Player(name, emoji)
+        val newPlayer = Player(name = name, emoji = emoji)
         val updated = _players.value + newPlayer
         _players.value = updated
 
         viewModelScope.launch {
-            repository.savePlayers(updated)
+            repository.addPlayer(newPlayer)
         }
     }
+
 }
 
