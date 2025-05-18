@@ -97,25 +97,41 @@ fun GameScreen(
             onDismiss = { showNumberDialog = false },
             onConfirm = { count ->
                 numberOfPlayers = count
-                selectedPlayers = List(count) { Player("", "") }
+
+                // Initialize the list of selected players with placeholder players (id = 0)
+                selectedPlayers = List(count) {
+                    Player(id = 0, name = "", emoji = "")
+                }
+
                 showPlayerPickerIndex = 0
                 showNumberDialog = false
             }
         )
     }
 
+
     showPlayerPickerIndex?.let { index ->
         PlayerPickerDialog(
             allPlayers = playerViewModel.players.value,
             selectedPlayers = selectedPlayers,
             onAddNew = { name, emoji ->
-                val newPlayer = Player(name, emoji)
+                // Create the new player instance (id will be 0 initially)
+                val newPlayer = Player(name = name, emoji = emoji)
+
+                // Add the player to the DB and update UI state
                 playerViewModel.addPlayer(name, emoji)
-                selectedPlayers = selectedPlayers.toMutableList().apply { this[index] = newPlayer }
+
+                // Update the selectedPlayers list with the new player immediately
+                selectedPlayers = selectedPlayers.toMutableList().apply {
+                    this[index] = newPlayer
+                }
+
                 proceedToNextPlayer(index)
             },
             onSelect = { player ->
-                selectedPlayers = selectedPlayers.toMutableList().apply { this[index] = player }
+                selectedPlayers = selectedPlayers.toMutableList().apply {
+                    this[index] = player
+                }
                 proceedToNextPlayer(index)
             },
             onDismiss = { showPlayerPickerIndex = null }
