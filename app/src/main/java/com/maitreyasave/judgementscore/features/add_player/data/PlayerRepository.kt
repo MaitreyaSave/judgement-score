@@ -1,18 +1,11 @@
 package com.maitreyasave.judgementscore.features.add_player.data
 
-import android.content.Context
-import androidx.room.Room
-import com.maitreyasave.judgementscore.database.PlayerDatabase
+import javax.inject.Inject
 
-class PlayerRepository(context: Context) {
 
-    private val db = Room.databaseBuilder(
-        context.applicationContext,
-        PlayerDatabase::class.java,
-        "player_db"
-    ).build()
-
-    private val playerDao = db.playerDao()
+class PlayerRepository @Inject constructor(
+    private val playerDao: PlayerDao
+) {
 
     suspend fun loadPlayers(): List<Player> {
         return playerDao.getAllPlayers().map {
@@ -30,4 +23,5 @@ class PlayerRepository(context: Context) {
         playerDao.insertPlayers(entities)
     }
 }
+
 

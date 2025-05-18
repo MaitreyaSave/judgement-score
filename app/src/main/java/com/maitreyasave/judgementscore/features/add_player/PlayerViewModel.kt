@@ -8,8 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.maitreyasave.judgementscore.features.add_player.data.Player
 import com.maitreyasave.judgementscore.features.add_player.data.PlayerRepository
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
+class PlayerViewModel @Inject constructor(
+    private val repository: PlayerRepository
+) : ViewModel() {
 
     private val _players = mutableStateOf<List<Player>>(emptyList())
     val players: State<List<Player>> = _players
@@ -33,6 +36,5 @@ class PlayerViewModel(private val repository: PlayerRepository) : ViewModel() {
             repository.addPlayer(newPlayer)
         }
     }
-
 }
 

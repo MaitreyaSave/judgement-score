@@ -23,8 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.maitreyasave.judgementscore.di.MyApp
 import com.maitreyasave.judgementscore.features.add_player.PlayerViewModel
-import com.maitreyasave.judgementscore.features.add_player.PlayerViewModelFactory
 
 @Composable
 fun AddPlayerDialog(
@@ -88,7 +88,11 @@ fun AddPlayerDialog(
 @Composable
 fun ProfileTab() {
     val context = LocalContext.current
-    val viewModel: PlayerViewModel = viewModel(factory = PlayerViewModelFactory(context))
+    val appComponent = (context.applicationContext as MyApp).appComponent
+
+    val factory = remember { appComponent.playerViewModelFactory() }
+    val viewModel: PlayerViewModel = viewModel(factory = factory)
+
     val players by viewModel.players
     var showAddPlayerDialog by remember { mutableStateOf(false) }
 
@@ -110,4 +114,5 @@ fun ProfileTab() {
         }
     }
 }
+
 
