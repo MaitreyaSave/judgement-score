@@ -69,6 +69,10 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler) // Required for annotation processing
 
+    // Dagger
+    implementation("com.google.dagger:dagger:2.50")
+    kapt("com.google.dagger:dagger-compiler:2.50")
+
 
     // Test impl
     testImplementation(libs.junit)

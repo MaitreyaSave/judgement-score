@@ -17,16 +17,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.maitreyasave.judgementscore.di.MyApp
 import com.maitreyasave.judgementscore.features.add_bet.BetAmountDialog
 import com.maitreyasave.judgementscore.features.add_player.PlayerViewModel
-import com.maitreyasave.judgementscore.features.add_player.PlayerViewModelFactory
 import com.maitreyasave.judgementscore.features.add_player.data.Player
 import com.maitreyasave.judgementscore.features.select_winner.WinnerSelectionDialog
 
 @Composable
-fun GameScreen(
-    playerViewModel: PlayerViewModel = viewModel(factory = PlayerViewModelFactory(LocalContext.current))
-) {
+fun GameScreen() {
+    val context = LocalContext.current
+    val appComponent = (context.applicationContext as MyApp).appComponent
+    val factory = remember { appComponent.playerViewModelFactory() }
+    val playerViewModel: PlayerViewModel = viewModel(factory = factory)
+
     var numberOfPlayers by remember { mutableIntStateOf(0) }
     var selectedPlayers by remember { mutableStateOf<List<Player>>(emptyList()) }
 
@@ -97,35 +100,25 @@ fun GameScreen(
             onDismiss = { showNumberDialog = false },
             onConfirm = { count ->
                 numberOfPlayers = count
-
-                // Initialize the list of selected players with placeholder players (id = 0)
                 selectedPlayers = List(count) {
                     Player(id = 0, name = "", emoji = "")
                 }
-
                 showPlayerPickerIndex = 0
                 showNumberDialog = false
             }
         )
     }
 
-
     showPlayerPickerIndex?.let { index ->
         PlayerPickerDialog(
             allPlayers = playerViewModel.players.value,
             selectedPlayers = selectedPlayers,
             onAddNew = { name, emoji ->
-                // Create the new player instance (id will be 0 initially)
                 val newPlayer = Player(name = name, emoji = emoji)
-
-                // Add the player to the DB and update UI state
                 playerViewModel.addPlayer(name, emoji)
-
-                // Update the selectedPlayers list with the new player immediately
                 selectedPlayers = selectedPlayers.toMutableList().apply {
                     this[index] = newPlayer
                 }
-
                 proceedToNextPlayer(index)
             },
             onSelect = { player ->
@@ -179,3 +172,4 @@ fun GameScreen(
         )
     }
 }
+
