@@ -1,5 +1,6 @@
 package com.maitreyasave.judgementscore.features.start_game.ui
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -22,13 +24,18 @@ import com.maitreyasave.judgementscore.features.add_bet.BetAmountDialog
 import com.maitreyasave.judgementscore.features.add_player.PlayerViewModel
 import com.maitreyasave.judgementscore.features.add_player.data.Player
 import com.maitreyasave.judgementscore.features.select_winner.WinnerSelectionDialog
+import com.maitreyasave.judgementscore.features.start_game.GameStateViewModel
+import com.maitreyasave.judgementscore.features.start_game.data.GameState
 
 @Composable
 fun GameScreen() {
     val context = LocalContext.current
+    val resumeGame = (context as? Activity)?.intent?.getBooleanExtra("resume", false) ?: false
+
     val appComponent = (context.applicationContext as MyApp).appComponent
-    val factory = remember { appComponent.playerViewModelFactory() }
-    val playerViewModel: PlayerViewModel = viewModel(factory = factory)
+    val playerFactory = remember { appComponent.playerViewModelFactory() }
+    val playerViewModel: PlayerViewModel = viewModel(factory = playerFactory)
+    val gameStateViewModel: GameStateViewModel = viewModel()
 
     var numberOfPlayers by remember { mutableIntStateOf(0) }
     var selectedPlayers by remember { mutableStateOf<List<Player>>(emptyList()) }
@@ -39,14 +46,28 @@ fun GameScreen() {
     var showBetAmountDialog by remember { mutableStateOf(false) }
     var showWinnerDialog by remember { mutableStateOf(false) }
 
-    var gameStarted by remember { mutableStateOf(false) }
+    var gameStarted by remember { mutableStateOf(resumeGame) }
     var numberOfRounds by remember { mutableIntStateOf(0) }
     var buttonRowIndex by remember { mutableIntStateOf(0) }
     var currentBetRow by remember { mutableIntStateOf(0) }
-
     var betAmounts by remember { mutableStateOf<Map<Int, Map<String, Int>>>(emptyMap()) }
 
     val scrollState = rememberScrollState()
+
+    // Load saved game state if needed
+    LaunchedEffect(Unit) {
+        if (resumeGame) {
+            gameStateViewModel.loadGameState()?.let { savedState ->
+                numberOfPlayers = savedState.numberOfPlayers
+                selectedPlayers = savedState.selectedPlayers
+                numberOfRounds = savedState.numberOfRounds
+                buttonRowIndex = savedState.buttonRowIndex
+                currentBetRow = savedState.currentBetRow
+                betAmounts = savedState.betAmounts
+                gameStarted = true
+            }
+        }
+    }
 
     fun updateBetAmounts(rowIndex: Int, betValues: Map<String, Int>) {
         betAmounts = betAmounts.toMutableMap().apply { put(rowIndex, betValues) }
@@ -61,6 +82,29 @@ fun GameScreen() {
         buttonRowIndex++
     }
 
+    // Save game state on changes
+    LaunchedEffect(
+        gameStarted,
+        numberOfPlayers,
+        selectedPlayers,
+        numberOfRounds,
+        buttonRowIndex,
+        currentBetRow,
+        betAmounts
+    ) {
+        if (gameStarted) {
+            val state = GameState(
+                numberOfPlayers = numberOfPlayers,
+                selectedPlayers = selectedPlayers,
+                numberOfRounds = numberOfRounds,
+                buttonRowIndex = buttonRowIndex,
+                currentBetRow = currentBetRow,
+                betAmounts = betAmounts
+            )
+            gameStateViewModel.saveGameState(state)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,6 +117,7 @@ fun GameScreen() {
             onSetPlayers = { showNumberDialog = true },
             onStartGame = {
                 gameStarted = true
+                gameStateViewModel.markGameStarted()
                 showRoundsDialog = true
             }
         )
@@ -171,5 +216,11 @@ fun GameScreen() {
             }
         )
     }
-}
 
+    // Handle end-of-game scenario
+    LaunchedEffect(gameStarted, numberOfRounds, buttonRowIndex) {
+        if (gameStarted && buttonRowIndex >= numberOfRounds) {
+            gameStateViewModel.markGameEnded()
+        }
+    }
+}

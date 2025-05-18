@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("org.jetbrains.kotlin.kapt")
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.20" // match your Kotlin version
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.20"
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27"
 }
 
 android {
@@ -67,11 +70,15 @@ dependencies {
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler) // Required for annotation processing
+    ksp(libs.androidx.room.compiler) // Required for annotation processing
 
     // Dagger
-    implementation("com.google.dagger:dagger:2.50")
-    kapt("com.google.dagger:dagger-compiler:2.50")
+    implementation(libs.dagger)
+    ksp(libs.dagger.compiler)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
+
 
 
     // Test impl
