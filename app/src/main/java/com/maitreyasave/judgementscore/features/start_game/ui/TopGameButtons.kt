@@ -14,7 +14,8 @@ fun TopGameButtons(
     enabled: Boolean,
     canStart: Boolean,
     onSetPlayers: () -> Unit,
-    onStartGame: () -> Unit
+    onStartGame: () -> Unit,
+    onEndGame: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -25,6 +26,9 @@ fun TopGameButtons(
         }
         Button(onClick = onStartGame, enabled = canStart && enabled, modifier = Modifier.weight(1f)) {
             Text("Start Game")
+        }
+        Button(onClick = onEndGame, enabled = !enabled, modifier = Modifier.weight(1f)) {
+            Text("End Game")
         }
     }
 }
