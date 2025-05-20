@@ -1,6 +1,6 @@
 package com.maitreyasave.judgementscore.features.start_game.data
 
-import com.maitreyasave.judgementscore.features.add_player.data.Player
+import com.maitreyasave.judgementscore.features.settings.add_player.data.Player
 import kotlinx.serialization.Serializable
 
 @Serializable

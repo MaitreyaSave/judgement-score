@@ -1,9 +1,9 @@
 package com.maitreyasave.judgementscore.di.modules
 
 import android.content.Context
-import com.maitreyasave.judgementscore.features.add_player.PlayerViewModelFactory
-import com.maitreyasave.judgementscore.features.add_player.data.PlayerDao
-import com.maitreyasave.judgementscore.features.add_player.data.PlayerRepository
+import com.maitreyasave.judgementscore.features.settings.add_player.PlayerViewModelFactory
+import com.maitreyasave.judgementscore.features.settings.add_player.data.PlayerDao
+import com.maitreyasave.judgementscore.features.settings.add_player.data.PlayerRepository
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

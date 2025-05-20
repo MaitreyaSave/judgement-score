@@ -2,7 +2,7 @@ package com.maitreyasave.judgementscore.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.maitreyasave.judgementscore.features.add_player.data.PlayerEntity
+import com.maitreyasave.judgementscore.features.settings.add_player.data.PlayerEntity
 
 @Database(
     entities = [PlayerEntity::class],

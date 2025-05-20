@@ -13,7 +13,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import com.maitreyasave.judgementscore.features.add_player.data.Player
+import com.maitreyasave.judgementscore.features.settings.add_player.data.Player
 
 @Composable
 fun BetAmountDialog(

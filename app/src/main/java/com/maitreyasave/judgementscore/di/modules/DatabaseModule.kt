@@ -3,7 +3,7 @@ package com.maitreyasave.judgementscore.di.modules
 import android.content.Context
 import androidx.room.Room
 import com.maitreyasave.judgementscore.database.PlayerDatabase
-import com.maitreyasave.judgementscore.features.add_player.data.PlayerDao
+import com.maitreyasave.judgementscore.features.settings.add_player.data.PlayerDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

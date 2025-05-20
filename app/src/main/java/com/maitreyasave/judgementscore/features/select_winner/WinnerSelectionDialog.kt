@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.maitreyasave.judgementscore.features.add_player.data.Player
+import com.maitreyasave.judgementscore.features.settings.add_player.data.Player
 
 @Composable
 fun WinnerSelectionDialog(

@@ -1,8 +1,8 @@
-package com.maitreyasave.judgementscore.features.add_player
+package com.maitreyasave.judgementscore.features.settings.add_player
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.maitreyasave.judgementscore.features.add_player.data.PlayerRepository
+import com.maitreyasave.judgementscore.features.settings.add_player.data.PlayerRepository
 
 class PlayerViewModelFactory(
     private val repository: PlayerRepository

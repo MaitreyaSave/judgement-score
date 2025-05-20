@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.features.add_player.data
+package com.maitreyasave.judgementscore.features.settings.add_player.data
 
 import javax.inject.Inject
 
