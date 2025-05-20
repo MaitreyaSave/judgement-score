@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.features.start_game
+package com.maitreyasave.judgementscore.features.home.start_game
 
 import android.app.Application
 import android.content.Context
@@ -7,7 +7,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import com.maitreyasave.judgementscore.features.start_game.data.GameState
+import com.maitreyasave.judgementscore.features.home.start_game.data.GameState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

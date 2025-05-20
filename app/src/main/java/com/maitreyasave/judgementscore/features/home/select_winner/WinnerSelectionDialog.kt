@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.features.select_winner
+package com.maitreyasave.judgementscore.features.home.select_winner
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

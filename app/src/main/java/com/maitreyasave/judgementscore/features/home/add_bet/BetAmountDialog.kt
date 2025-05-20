@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.features.add_bet
+package com.maitreyasave.judgementscore.features.home.add_bet
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState

@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.features.start_game.ui
+package com.maitreyasave.judgementscore.features.home.start_game.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

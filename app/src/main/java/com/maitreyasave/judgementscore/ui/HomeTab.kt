@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.maitreyasave.judgementscore.features.start_game.GameActivity
-import com.maitreyasave.judgementscore.features.start_game.GameStateViewModel
+import com.maitreyasave.judgementscore.features.home.start_game.GameActivity
+import com.maitreyasave.judgementscore.features.home.start_game.GameStateViewModel
 
 @Composable
 fun HomeTab() {

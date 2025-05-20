@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.features.start_game.ui
+package com.maitreyasave.judgementscore.features.home.start_game.ui
 
 import android.app.Activity
 import android.app.Application
@@ -21,12 +21,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maitreyasave.judgementscore.di.MyApp
-import com.maitreyasave.judgementscore.features.add_bet.BetAmountDialog
-import com.maitreyasave.judgementscore.features.select_winner.WinnerSelectionDialog
+import com.maitreyasave.judgementscore.features.home.add_bet.BetAmountDialog
+import com.maitreyasave.judgementscore.features.home.select_winner.WinnerSelectionDialog
+import com.maitreyasave.judgementscore.features.home.start_game.GameStateViewModel
+import com.maitreyasave.judgementscore.features.home.start_game.data.GameState
 import com.maitreyasave.judgementscore.features.settings.add_player.PlayerViewModel
 import com.maitreyasave.judgementscore.features.settings.add_player.data.Player
-import com.maitreyasave.judgementscore.features.start_game.GameStateViewModel
-import com.maitreyasave.judgementscore.features.start_game.data.GameState
 
 @Composable
 fun GameScreen() {
