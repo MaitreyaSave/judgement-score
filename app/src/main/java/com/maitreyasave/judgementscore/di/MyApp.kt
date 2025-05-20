@@ -1,10 +1,12 @@
 package com.maitreyasave.judgementscore.di
 
 import android.app.Application
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import com.maitreyasave.judgementscore.di.modules.AppModule
 import com.maitreyasave.judgementscore.di.modules.DatabaseModule
 
-class MyApp : Application() {
+class MyApp : Application(), ViewModelStoreOwner {
 
     lateinit var appComponent: AppComponent
         private set
@@ -16,4 +18,7 @@ class MyApp : Application() {
             .databaseModule(DatabaseModule())
             .build()
     }
+
+    override val viewModelStore: ViewModelStore
+        get() = ViewModelStore()
 }

@@ -1,6 +1,7 @@
 package com.maitreyasave.judgementscore.features.start_game.ui
 
 import android.app.Activity
+import android.app.Application
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +36,9 @@ fun GameScreen() {
     val appComponent = (context.applicationContext as MyApp).appComponent
     val playerFactory = remember { appComponent.playerViewModelFactory() }
     val playerViewModel: PlayerViewModel = viewModel(factory = playerFactory)
-    val gameStateViewModel: GameStateViewModel = viewModel()
+    val gameStateViewModel = remember {
+        GameStateViewModel.getInstance(context.applicationContext as Application)
+    }
 
     var numberOfPlayers by remember { mutableIntStateOf(0) }
     var selectedPlayers by remember { mutableStateOf<List<Player>>(emptyList()) }
@@ -119,6 +122,10 @@ fun GameScreen() {
                 gameStarted = true
                 gameStateViewModel.markGameStarted()
                 showRoundsDialog = true
+            },
+            onEndGame = {
+                gameStarted = false
+                gameStateViewModel.markGameEnded()
             }
         )
 
