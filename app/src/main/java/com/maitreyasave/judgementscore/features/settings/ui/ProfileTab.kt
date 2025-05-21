@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.ui
+package com.maitreyasave.judgementscore.features.settings.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
