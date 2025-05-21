@@ -22,20 +22,22 @@ fun GameGrid(
     betAmounts: Map<Int, Map<String, Int>>,
     buttonRowIndex: Int,
     onBetClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
+    numberOfCards: Int
 ) {
     val suits = listOf("♠️", "♥️", "♣️", "♦️", "⬜")
-    val suitCellSize = 40.dp
-    val buttonCellSize = 100.dp
+    val suitCellSize = 80.dp
+    var numCardsPerRound = numberOfCards
+    var decreasing = true
 
     Column(modifier = Modifier.padding(top = 24.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Suit", Modifier.width(suitCellSize), textAlign = TextAlign.Center)
             selectedPlayers.forEach {
-                Text("${it.emoji} ${it.name}", Modifier.weight(1f), textAlign = TextAlign.Center, maxLines = 1)
+                Text("${it.emoji} ${it.name}", Modifier.weight(1f), textAlign = TextAlign.Start, maxLines = 1)
             }
-            Text("Bet", Modifier.width(buttonCellSize), textAlign = TextAlign.Center)
-            Text("Next", Modifier.width(buttonCellSize), textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -43,7 +45,7 @@ fun GameGrid(
         for (i in 0 until numberOfRounds) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    suits[i % suits.size],
+                    suits[i % suits.size] + " ($numCardsPerRound)",
                     Modifier.width(suitCellSize).padding(start = 16.dp),
                     textAlign = TextAlign.Center
                 )
@@ -57,13 +59,24 @@ fun GameGrid(
                     )
                 }
                 if (i == buttonRowIndex) {
-                    Button(onClick = onBetClick, modifier = Modifier.width(buttonCellSize)) { Text("Bet") }
-                    Button(onClick = onNextClick, modifier = Modifier.width(buttonCellSize)) { Text("Next") }
+                    Button(onClick = onBetClick, modifier = Modifier.weight(1f)) { Text("Bet") }
+                    Button(onClick = onNextClick, modifier = Modifier.weight(1f)) { Text("Next") }
                 } else {
-                    Spacer(modifier = Modifier.width(buttonCellSize))
-                    Spacer(modifier = Modifier.width(buttonCellSize))
+                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.weight(1f))
                 }
+            }
+
+            if(decreasing) {
+                numCardsPerRound--
+                if(numCardsPerRound == 0) {
+                    decreasing = false
+                }
+            } else {
+                numCardsPerRound++
             }
         }
     }
 }
+
+

@@ -23,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maitreyasave.judgementscore.di.MyApp
 import com.maitreyasave.judgementscore.features.home.add_bet.BetAmountDialog
 import com.maitreyasave.judgementscore.features.home.select_winner.WinnerSelectionDialog
+import com.maitreyasave.judgementscore.features.home.start_game.CalculateRoundsViewModel
 import com.maitreyasave.judgementscore.features.home.start_game.GameStateViewModel
 import com.maitreyasave.judgementscore.features.home.start_game.data.GameState
 import com.maitreyasave.judgementscore.features.settings.add_player.PlayerViewModel
@@ -39,6 +40,8 @@ fun GameScreen() {
     val gameStateViewModel = remember {
         GameStateViewModel.getInstance(context.applicationContext as Application)
     }
+    val calculateRoundsViewModel: CalculateRoundsViewModel = viewModel()
+    val autoCalculate = calculateRoundsViewModel.shouldCalculateRounds()
 
     var numberOfPlayers by remember { mutableIntStateOf(0) }
     var selectedPlayers by remember { mutableStateOf<List<Player>>(emptyList()) }
@@ -53,6 +56,7 @@ fun GameScreen() {
     var numberOfRounds by remember { mutableIntStateOf(0) }
     var buttonRowIndex by remember { mutableIntStateOf(0) }
     var currentBetRow by remember { mutableIntStateOf(0) }
+    var maxHands by remember { mutableStateOf(0) }
     var betAmounts by remember { mutableStateOf<Map<Int, Map<String, Int>>>(emptyMap()) }
 
     val scrollState = rememberScrollState()
@@ -68,6 +72,7 @@ fun GameScreen() {
                 currentBetRow = savedState.currentBetRow
                 betAmounts = savedState.betAmounts
                 gameStarted = true
+                maxHands = savedState.maxHands
             }
         }
     }
@@ -93,7 +98,8 @@ fun GameScreen() {
         numberOfRounds,
         buttonRowIndex,
         currentBetRow,
-        betAmounts
+        betAmounts,
+        maxHands
     ) {
         if (gameStarted) {
             val state = GameState(
@@ -102,7 +108,8 @@ fun GameScreen() {
                 numberOfRounds = numberOfRounds,
                 buttonRowIndex = buttonRowIndex,
                 currentBetRow = currentBetRow,
-                betAmounts = betAmounts
+                betAmounts = betAmounts,
+                maxHands = maxHands
             )
             gameStateViewModel.saveGameState(state)
         }
@@ -121,7 +128,7 @@ fun GameScreen() {
             onStartGame = {
                 gameStarted = true
                 gameStateViewModel.markGameStarted()
-                showRoundsDialog = true
+                showRoundsDialog = !autoCalculate
             },
             onEndGame = {
                 gameStarted = false
@@ -138,7 +145,8 @@ fun GameScreen() {
                 betAmounts = betAmounts,
                 buttonRowIndex = buttonRowIndex,
                 onBetClick = { showBetAmountDialog = true },
-                onNextClick = { showWinnerDialog = true }
+                onNextClick = { showWinnerDialog = true },
+                numberOfCards = maxHands
             )
         }
 
@@ -157,6 +165,12 @@ fun GameScreen() {
                 }
                 showPlayerPickerIndex = 0
                 showNumberDialog = false
+
+                if(autoCalculate) {
+                    calculateRoundsViewModel.calculateRoundsAndHands(numberOfPlayers)
+                    numberOfRounds = calculateRoundsViewModel.getNumRounds()
+                    maxHands = calculateRoundsViewModel.getMaxHands()
+                }
             }
         )
     }
@@ -189,6 +203,8 @@ fun GameScreen() {
             onConfirm = {
                 numberOfRounds = it
                 showRoundsDialog = false
+                calculateRoundsViewModel.calculateMaxHands(numberOfPlayers)
+                maxHands = calculateRoundsViewModel.getMaxHands()
             }
         )
     }
