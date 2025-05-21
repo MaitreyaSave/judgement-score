@@ -95,10 +95,33 @@ fun ProfileTab() {
 
     val players by viewModel.players
     var showAddPlayerDialog by remember { mutableStateOf(false) }
+    var autoCalculateRounds by remember { mutableStateOf(true) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
-        SettingsItem("Add Player") { showAddPlayerDialog = true }
+
+
+        SettingsItem(
+            title = "Auto-calculate rows",
+            onClick = {
+                // Clicking the item should also update the checkbox
+                autoCalculateRounds = !autoCalculateRounds
+            },
+            showCheckbox = true,
+            isChecked = autoCalculateRounds,
+            onCheckedChange = { autoCalculateRounds = it }
+        )
+
+
+        SettingsItem(
+            title = "Add Player",
+            onClick = { showAddPlayerDialog = true },
+            showCheckbox = false,
+            isChecked = false,
+            onCheckedChange = {
+                // No-op
+            }
+        )
 
         Text("Players List:", style = MaterialTheme.typography.bodyLarge)
         players.forEach { player -> Text("${player.name} ${player.emoji}") }
