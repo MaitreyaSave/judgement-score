@@ -10,5 +10,6 @@ data class GameState(
     val numberOfRounds: Int,
     val buttonRowIndex: Int,
     val currentBetRow: Int,
-    val betAmounts: Map<Int, Map<String, Int>>
+    val betAmounts: Map<Int, Map<String, Int>>,
+    val maxHands: Int
 )

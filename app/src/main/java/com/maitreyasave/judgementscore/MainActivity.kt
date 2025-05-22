@@ -15,8 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.maitreyasave.judgementscore.ui.HomeTab
-import com.maitreyasave.judgementscore.ui.ProfileTab
+import com.maitreyasave.judgementscore.features.home.ui.HomeTab
+import com.maitreyasave.judgementscore.features.settings.ui.ProfileTab
 import com.maitreyasave.judgementscore.ui.theme.JudgementScoreTheme
 import kotlinx.coroutines.launch
 

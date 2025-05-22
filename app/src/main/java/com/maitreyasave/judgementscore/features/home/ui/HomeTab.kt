@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.ui
+package com.maitreyasave.judgementscore.features.home.ui
 
 import android.app.Application
 import android.content.Intent

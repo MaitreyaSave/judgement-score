@@ -1,4 +1,4 @@
-package com.maitreyasave.judgementscore.ui
+package com.maitreyasave.judgementscore.features.settings.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.maitreyasave.judgementscore.di.MyApp
 import com.maitreyasave.judgementscore.features.settings.add_player.PlayerViewModel
+import com.maitreyasave.judgementscore.features.settings.calculate_rounds.ShouldCalculateRoundsViewModel
 
 @Composable
 fun AddPlayerDialog(
@@ -91,14 +93,40 @@ fun ProfileTab() {
     val appComponent = (context.applicationContext as MyApp).appComponent
 
     val factory = remember { appComponent.playerViewModelFactory() }
-    val viewModel: PlayerViewModel = viewModel(factory = factory)
+    val playerViewModel: PlayerViewModel = viewModel(factory = factory)
+    val shouldCalculateRoundsViewModel: ShouldCalculateRoundsViewModel = viewModel()
 
-    val players by viewModel.players
+    val players by playerViewModel.players
+    val isChecked by shouldCalculateRoundsViewModel.isFeatureEnabled.collectAsState()
     var showAddPlayerDialog by remember { mutableStateOf(false) }
+//    var autoCalculateRounds by remember { mutableStateOf(true) }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
-        SettingsItem("Add Player") { showAddPlayerDialog = true }
+
+
+        SettingsItem(
+            title = "Auto-calculate rounds",
+            onClick = {
+                // Clicking the item should also update the checkbox
+//                autoCalculateRounds = !autoCalculateRounds
+                shouldCalculateRoundsViewModel.onFeatureEnabledChanged(!isChecked)
+            },
+            showCheckbox = true,
+            isChecked = isChecked,
+            onCheckedChange = { shouldCalculateRoundsViewModel.onFeatureEnabledChanged(it) }
+        )
+
+
+        SettingsItem(
+            title = "Add Player",
+            onClick = { showAddPlayerDialog = true },
+            showCheckbox = false,
+            isChecked = false,
+            onCheckedChange = {
+                // No-op
+            }
+        )
 
         Text("Players List:", style = MaterialTheme.typography.bodyLarge)
         players.forEach { player -> Text("${player.name} ${player.emoji}") }
@@ -107,7 +135,7 @@ fun ProfileTab() {
             AddPlayerDialog(
                 onDismiss = { showAddPlayerDialog = false },
                 onSave = { name, emoji ->
-                    viewModel.addPlayer(name, emoji)
+                    playerViewModel.addPlayer(name, emoji)
                     showAddPlayerDialog = false
                 }
             )
