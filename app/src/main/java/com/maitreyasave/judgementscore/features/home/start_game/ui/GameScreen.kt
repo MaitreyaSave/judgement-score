@@ -132,7 +132,7 @@ fun GameScreen() {
             },
             onEndGame = {
                 gameStarted = false
-                gameStateViewModel.markGameEnded()
+                gameStateViewModel.markGameEnded(selectedPlayers)
             }
         )
 
@@ -243,7 +243,7 @@ fun GameScreen() {
     // Handle end-of-game scenario
     LaunchedEffect(gameStarted, numberOfRounds, buttonRowIndex) {
         if (gameStarted && buttonRowIndex >= numberOfRounds) {
-            gameStateViewModel.markGameEnded()
+            gameStateViewModel.markGameEnded(selectedPlayers)
         }
     }
 }
