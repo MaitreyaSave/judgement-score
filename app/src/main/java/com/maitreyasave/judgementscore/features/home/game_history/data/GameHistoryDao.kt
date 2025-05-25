@@ -1,6 +1,7 @@
 package com.maitreyasave.judgementscore.features.home.game_history.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -23,6 +24,12 @@ interface GameHistoryDao {
 
     @Query("SELECT * FROM game_history ORDER BY timestamp DESC")
     suspend fun getAllGameHistories(): List<GameHistoryEntity>
+
+    @Delete
+    suspend fun delete(gameHistory: GameHistoryEntity)
+
+    @Query("DELETE FROM game_history WHERE id = :id")
+    suspend fun deleteById(id: Int)
 
     @Query("SELECT * FROM PlayerScoreEntity WHERE gameId = :gameId")
     suspend fun getScoresForGame(gameId: Int): List<PlayerScoreEntity>

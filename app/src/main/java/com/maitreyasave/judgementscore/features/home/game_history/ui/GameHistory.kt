@@ -16,9 +16,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.maitreyasave.judgementscore.features.home.game_history.data.GameHistoryEntity
+import java.text.DateFormat
+import java.util.Date
 
 @Composable
-fun GameHistory(gameHistory: List<Pair<String, String>>) {
+fun GameHistory(
+    gameHistory: List<GameHistoryEntity>,
+    onDeleteItem: (Int) -> Unit
+) {
     var selectedScore by remember { mutableStateOf<String?>(null) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -30,11 +36,18 @@ fun GameHistory(gameHistory: List<Pair<String, String>>) {
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(gameHistory) { (summary, scoreDetails) ->
+            items(gameHistory, key = { it.id }) { entry ->
+                val summary = "Winner: ${entry.winnerName}"
+                val scoreDetails = "Game played at ${
+                    DateFormat.getDateTimeInstance().format(Date(entry.timestamp))
+                }"
+
                 GameHistoryCard(
+                    id = entry.id.toString(),
                     summary = summary,
                     scoreDetails = scoreDetails,
-                    onViewScore = { selectedScore = it }
+                    onViewScore = { selectedScore = it },
+                    onDeleteConfirmed = { onDeleteItem(entry.id) }
                 )
             }
         }
