@@ -33,6 +33,7 @@ fun GameGrid(
     selectedPlayers: List<Player>,
     betAmounts: Map<Int, Map<String, Int>>,
     buttonRowIndex: Int,
+    onUndoClick: () -> Unit,
     onBetClick: () -> Unit,
     onNextClick: () -> Unit,
     numberOfCards: Int,
@@ -153,6 +154,9 @@ fun GameGrid(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Button(onClick = onUndoClick, modifier = Modifier.weight(1f)) {
+                    Text("Undo")
+                }
                 Button(onClick = onBetClick, modifier = Modifier.weight(1f)) {
                     Text("Bet")
                 }
@@ -199,6 +203,7 @@ fun GameGrid(
                             )
                         }
                         if (i == buttonRowIndex) {
+                            Button(onClick = onUndoClick, modifier = Modifier.weight(1f)) { Text("Undo") }
                             Button(onClick = onBetClick, modifier = Modifier.weight(1f)) { Text("Bet") }
                             Button(onClick = onNextClick, modifier = Modifier.weight(1f)) { Text("Next") }
                         } else {

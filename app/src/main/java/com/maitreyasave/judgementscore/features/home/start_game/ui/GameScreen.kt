@@ -47,16 +47,17 @@ fun GameScreen(
 
     var numberOfPlayers by remember { mutableIntStateOf(0) }
     var selectedPlayers by remember { mutableStateOf<List<Player>>(emptyList()) }
+    var previousWinners by remember { mutableStateOf(setOf<String>()) }
 
     var showNumberDialog by remember { mutableStateOf(false) }
     var showPlayerPickerIndex by remember { mutableStateOf<Int?>(null) }
     var showRoundsDialog by remember { mutableStateOf(false) }
     var showBetAmountDialog by remember { mutableStateOf(false) }
     var showWinnerDialog by remember { mutableStateOf(false) }
+    var undoWinnders by remember { mutableStateOf(false) }
 
     var gameStarted by remember { mutableStateOf(resumeGame) }
     var numberOfRounds by remember { mutableIntStateOf(0) }
-    var buttonRowIndex by remember { mutableIntStateOf(0) }
     var currentBetRow by remember { mutableIntStateOf(0) }
     var maxHands by remember { mutableStateOf(0) }
     var betAmounts by remember { mutableStateOf<Map<Int, Map<String, Int>>>(emptyMap()) }
@@ -70,7 +71,6 @@ fun GameScreen(
                 numberOfPlayers = savedState.numberOfPlayers
                 selectedPlayers = savedState.selectedPlayers
                 numberOfRounds = savedState.numberOfRounds
-                buttonRowIndex = savedState.buttonRowIndex
                 currentBetRow = savedState.currentBetRow
                 betAmounts = savedState.betAmounts
                 gameStarted = true
@@ -89,7 +89,6 @@ fun GameScreen(
 
     fun proceedToNextRound() {
         currentBetRow++
-        buttonRowIndex++
     }
 
     // Save game state on changes
@@ -98,7 +97,6 @@ fun GameScreen(
         numberOfPlayers,
         selectedPlayers,
         numberOfRounds,
-        buttonRowIndex,
         currentBetRow,
         betAmounts,
         maxHands
@@ -108,7 +106,6 @@ fun GameScreen(
                 numberOfPlayers = numberOfPlayers,
                 selectedPlayers = selectedPlayers,
                 numberOfRounds = numberOfRounds,
-                buttonRowIndex = buttonRowIndex,
                 currentBetRow = currentBetRow,
                 betAmounts = betAmounts,
                 maxHands = maxHands
@@ -146,7 +143,11 @@ fun GameScreen(
                 numberOfRounds = numberOfRounds,
                 selectedPlayers = selectedPlayers,
                 betAmounts = betAmounts,
-                buttonRowIndex = buttonRowIndex,
+                buttonRowIndex = currentBetRow,
+                onUndoClick = {
+                    showWinnerDialog = true
+                    undoWinnders = true
+                },
                 onBetClick = { showBetAmountDialog = true },
                 onNextClick = { showWinnerDialog = true },
                 numberOfCards = maxHands,
@@ -227,30 +228,58 @@ fun GameScreen(
             onDismiss = { showBetAmountDialog = false }
         )
     }
+    fun updateScores(
+        winners: Set<String>,
+        revert: Boolean
+    ) {
+        if(revert) {
+            currentBetRow--
+            val currentBets = betAmounts[currentBetRow]
+
+            selectedPlayers = selectedPlayers.map { player ->
+                val bet = currentBets?.get(player.name) ?: 0
+                val bonus = 10
+                val newScore = if (player.name in previousWinners) player.score - (bet + bonus)
+                else player.score + bet + bonus
+
+                player.copy(score = newScore)
+            }
+
+        }
+        val currentBets = betAmounts[currentBetRow]
+        selectedPlayers = selectedPlayers.map { player ->
+            val bet = currentBets?.get(player.name) ?: 0
+            val bonus = 10
+            val newScore = if (player.name in winners) player.score + bet + bonus
+            else player.score - (bet + bonus)
+
+            player.copy(score = newScore)
+        }
+
+        previousWinners = winners
+        showWinnerDialog = false
+        undoWinnders = false
+        proceedToNextRound()
+    }
 
     if (showWinnerDialog) {
         WinnerSelectionDialog(
             players = selectedPlayers,
             onDismiss = { showWinnerDialog = false },
             onFinish = { winners ->
-                val currentBets = betAmounts[currentBetRow]
-                selectedPlayers = selectedPlayers.map { player ->
-                    val bet = currentBets?.get(player.name) ?: 0
-                    val bonus = 10
-                    val newScore = if (player in winners) player.score + bet + bonus
-                    else player.score - (bet + bonus)
-                    player.copy(score = newScore)
-                }
-                showWinnerDialog = false
-                proceedToNextRound()
+                val winnerStrings = winners.map {
+                    it.name
+                }.toSet()
+                updateScores(winnerStrings, undoWinnders)
             }
         )
     }
 
     // Handle end-of-game scenario
-    LaunchedEffect(gameStarted, numberOfRounds, buttonRowIndex) {
-        if (gameStarted && buttonRowIndex >= numberOfRounds) {
+    LaunchedEffect(gameStarted, numberOfRounds, currentBetRow) {
+        if (gameStarted && currentBetRow >= numberOfRounds) {
             gameStateViewModel.markGameEnded(selectedPlayers)
         }
     }
+
 }
