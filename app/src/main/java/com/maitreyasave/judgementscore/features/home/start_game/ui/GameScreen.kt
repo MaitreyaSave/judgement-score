@@ -154,7 +154,10 @@ fun GameScreen(
         }
 
         if (selectedPlayers.isNotEmpty()) {
-            PlayerScoresRow(selectedPlayers)
+            PlayerScoresRow(
+                players = selectedPlayers,
+                isPortrait = isPortrait
+            )
         }
     }
 
