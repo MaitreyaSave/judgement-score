@@ -149,7 +149,8 @@ fun GameScreen(
                 buttonRowIndex = buttonRowIndex,
                 onBetClick = { showBetAmountDialog = true },
                 onNextClick = { showWinnerDialog = true },
-                numberOfCards = maxHands
+                numberOfCards = maxHands,
+                isPortrait = isPortrait
             )
         }
 
