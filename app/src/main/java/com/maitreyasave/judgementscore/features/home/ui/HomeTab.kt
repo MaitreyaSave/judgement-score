@@ -77,6 +77,16 @@ fun HomeTab() {
                 Text("Start Game (Landscape)")
             }
 
+            Button(onClick = {
+                val intent = Intent(context, GameActivity::class.java).apply {
+                    putExtra("resume", false)
+                    putExtra("portrait", true)
+                }
+                context.startActivity(intent)
+            }) {
+                Text("Start Game (Portrait)")
+            }
+
             if (hasSavedGame) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = {
