@@ -30,7 +30,9 @@ import com.maitreyasave.judgementscore.features.settings.add_player.PlayerViewMo
 import com.maitreyasave.judgementscore.features.settings.add_player.data.Player
 
 @Composable
-fun GameScreen() {
+fun GameScreen(
+    isPortrait: Boolean
+) {
     val context = LocalContext.current
     val resumeGame = (context as? Activity)?.intent?.getBooleanExtra("resume", false) ?: false
 
@@ -133,7 +135,8 @@ fun GameScreen() {
             onEndGame = {
                 gameStarted = false
                 gameStateViewModel.markGameEnded(selectedPlayers)
-            }
+            },
+            isPortrait = isPortrait
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -146,12 +149,16 @@ fun GameScreen() {
                 buttonRowIndex = buttonRowIndex,
                 onBetClick = { showBetAmountDialog = true },
                 onNextClick = { showWinnerDialog = true },
-                numberOfCards = maxHands
+                numberOfCards = maxHands,
+                isPortrait = isPortrait
             )
         }
 
         if (selectedPlayers.isNotEmpty()) {
-            PlayerScoresRow(selectedPlayers)
+            PlayerScoresRow(
+                players = selectedPlayers,
+                isPortrait = isPortrait
+            )
         }
     }
 

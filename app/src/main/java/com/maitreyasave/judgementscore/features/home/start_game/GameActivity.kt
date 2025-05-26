@@ -15,11 +15,9 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val orientation = intent.getBooleanExtra("portrait", false)
+        val isPortrait = intent.getBooleanExtra("portrait", false)
 
-
-        // Lock orientation to landscape
-        if(!orientation)
+        if(!isPortrait)
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         setContent {
@@ -28,7 +26,7 @@ class GameActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    GameScreen()
+                    GameScreen(isPortrait)
                 }
             }
         }
