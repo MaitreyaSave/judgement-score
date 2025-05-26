@@ -43,7 +43,7 @@ fun GameHistory(
 
                 val formatter = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
                 val summary = "Winner: ${entry.winnerName} \n" +
-                        "Game played at ${formatter.format(Date(entry.timestamp))}"
+                        "When: ${formatter.format(Date(entry.timestamp))}"
 
                 GameHistoryCard(
                     id = entry.id.toString(),
