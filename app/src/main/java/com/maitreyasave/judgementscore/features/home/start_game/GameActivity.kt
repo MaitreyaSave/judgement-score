@@ -15,8 +15,12 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val orientation = intent.getBooleanExtra("portrait", false)
+
+
         // Lock orientation to landscape
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        if(!orientation)
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
         setContent {
             JudgementScoreTheme {

@@ -16,13 +16,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.maitreyasave.judgementscore.features.home.game_history.data.GameHistoryEntity
-import java.text.DateFormat
+import com.maitreyasave.judgementscore.features.home.game_history.data.GameScoreHistory
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 @Composable
 fun GameHistory(
-    gameHistory: List<GameHistoryEntity>,
+    gameHistory: List<GameScoreHistory>,
     onDeleteItem: (Int) -> Unit
 ) {
     var selectedScore by remember { mutableStateOf<String?>(null) }
@@ -36,16 +37,18 @@ fun GameHistory(
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(gameHistory, key = { it.id }) { entry ->
-                val summary = "Winner: ${entry.winnerName}"
-                val scoreDetails = "Game played at ${
-                    DateFormat.getDateTimeInstance().format(Date(entry.timestamp))
-                }"
+            items(gameHistory, key = { it.history.id }) { gameScore ->
+                val entry = gameScore.history
+                val score = gameScore.scores
+
+                val formatter = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
+                val summary = "Winner: ${entry.winnerName} \n" +
+                        "Game played at ${formatter.format(Date(entry.timestamp))}"
 
                 GameHistoryCard(
                     id = entry.id.toString(),
                     summary = summary,
-                    scoreDetails = scoreDetails,
+                    scoreDetails = score,
                     onViewScore = { selectedScore = it },
                     onDeleteConfirmed = { onDeleteItem(entry.id) }
                 )
