@@ -135,7 +135,8 @@ fun GameScreen(
             onEndGame = {
                 gameStarted = false
                 gameStateViewModel.markGameEnded(selectedPlayers)
-            }
+            },
+            isPortrait = isPortrait
         )
 
         Spacer(modifier = Modifier.height(16.dp))
