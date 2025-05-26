@@ -70,6 +70,7 @@ fun HomeTab() {
             Button(onClick = {
                 val intent = Intent(context, GameActivity::class.java).apply {
                     putExtra("resume", false)
+                    putExtra("portrait", false)
                 }
                 context.startActivity(intent)
             }) {

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewModelScope
 import com.maitreyasave.judgementscore.database.GameHistoryDatabase
 import com.maitreyasave.judgementscore.features.home.game_history.data.GameHistoryEntity
+import com.maitreyasave.judgementscore.features.home.game_history.data.GameScoreHistory
 import com.maitreyasave.judgementscore.features.home.game_history.data.PlayerScoreEntity
 import com.maitreyasave.judgementscore.features.home.start_game.data.GameState
 import com.maitreyasave.judgementscore.features.settings.add_player.data.Player
@@ -25,8 +26,8 @@ class GameStateViewModel(application: Application) : AndroidViewModel(applicatio
     private val database = GameHistoryDatabase.getInstance(application)
     private val dao = database.gameHistoryDao()
 
-    private val _gameHistory = MutableStateFlow<List<GameHistoryEntity>>(emptyList())
-    val gameHistory: StateFlow<List<GameHistoryEntity>> = _gameHistory.asStateFlow()
+    private val _gameHistory = MutableStateFlow<List<GameScoreHistory>>(emptyList())
+    val gameHistory: StateFlow<List<GameScoreHistory>> = _gameHistory.asStateFlow()
 
     private val prefs = application.getSharedPreferences("game_prefs", Context.MODE_PRIVATE)
     private val _hasSavedGame = MutableStateFlow(false)
@@ -38,7 +39,19 @@ class GameStateViewModel(application: Application) : AndroidViewModel(applicatio
         _hasSavedGame.value = prefs.getBoolean("is_game_in_progress", false)
 
         viewModelScope.launch(Dispatchers.IO) {
-            dao.getAllGameHistoriesFlow().collect { _gameHistory.value = it }
+            dao.getAllGameHistoriesFlow().collect { histories ->
+
+                _gameHistory.value = histories.map { history ->
+                    val scores = dao.getScoresForGame(history.id)
+                    val scoreString = scores.joinToString("\n") {
+                        "${it.playerName}: ${it.score}"
+                    }
+                    GameScoreHistory(
+                        history = history,
+                        scores = scoreString
+                    )
+                }
+            }
         }
     }
 
@@ -110,5 +123,10 @@ class GameStateViewModel(application: Application) : AndroidViewModel(applicatio
                 ViewModelProvider.AndroidViewModelFactory.getInstance(application)
             )[GameStateViewModel::class.java]
         }
+
+//        val EMPTY_HISTORY = GameScoreHistory(
+//            emptyList(),
+//            emptyList()
+//        )
     }
 }
