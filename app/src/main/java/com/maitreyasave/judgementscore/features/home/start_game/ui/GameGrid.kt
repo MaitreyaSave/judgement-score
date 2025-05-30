@@ -33,13 +33,14 @@ fun GameGrid(
     selectedPlayers: List<Player>,
     betAmounts: Map<Int, Map<String, Int>>,
     buttonRowIndex: Int,
+    onUndoClick: () -> Unit,
     onBetClick: () -> Unit,
     onNextClick: () -> Unit,
     numberOfCards: Int,
     isPortrait: Boolean
 ) {
     val suits = listOf("♠️", "♥️", "♣️", "♦️", "⬜")
-    val suitCellSize = 60.dp
+    val cellWidth = 60.dp
     val cellHeight = 30.dp
     val cardsPerRoundList = mutableListOf<Int>()
 
@@ -51,7 +52,7 @@ fun GameGrid(
             cardsPerRoundList.add(cards)
             if (decreasing) {
                 cards--
-                if (cards == 0) decreasing = false
+                if (cards == 1) decreasing = false
             } else {
                 cards++
             }
@@ -123,7 +124,7 @@ fun GameGrid(
 
                             Text(
                                 text = label,
-                                modifier = Modifier.width(suitCellSize)
+                                modifier = Modifier.width(cellWidth)
                                     .padding(0.dp, 3.dp),
                                 textAlign = TextAlign.Center,
                                 maxLines = 1
@@ -134,7 +135,7 @@ fun GameGrid(
                             selectedPlayers.forEach { player ->
                                 Text(
                                     text = "${betAmounts[i]?.get(player.name) ?: 0}",
-                                    modifier = Modifier.width(suitCellSize)
+                                    modifier = Modifier.width(cellWidth)
                                         .padding(0.dp, 2.dp)
                                         .height(cellHeight),
                                     textAlign = TextAlign.Center,
@@ -153,6 +154,9 @@ fun GameGrid(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Button(onClick = onUndoClick, modifier = Modifier.weight(1f)) {
+                    Text("Undo")
+                }
                 Button(onClick = onBetClick, modifier = Modifier.weight(1f)) {
                     Text("Bet")
                 }
@@ -164,7 +168,7 @@ fun GameGrid(
             // Landscape mode
             Column {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("Suit", Modifier.width(suitCellSize), textAlign = TextAlign.Center)
+                    Text("Suit", Modifier.width(cellWidth), textAlign = TextAlign.Center)
                     selectedPlayers.forEach {
                         Text("${it.emoji} ${it.name}", Modifier.weight(1f), textAlign = TextAlign.Start, maxLines = 1)
                     }
@@ -186,7 +190,7 @@ fun GameGrid(
                     ) {
                         Text(
                             "${suits[i % suits.size]} ($cards)",
-                            Modifier.width(suitCellSize).padding(start = 16.dp),
+                            Modifier.width(cellWidth).padding(start = 16.dp),
                             textAlign = TextAlign.Center
                         )
                         selectedPlayers.forEach { player ->
@@ -199,6 +203,7 @@ fun GameGrid(
                             )
                         }
                         if (i == buttonRowIndex) {
+                            Button(onClick = onUndoClick, modifier = Modifier.weight(1f)) { Text("Undo") }
                             Button(onClick = onBetClick, modifier = Modifier.weight(1f)) { Text("Bet") }
                             Button(onClick = onNextClick, modifier = Modifier.weight(1f)) { Text("Next") }
                         } else {
