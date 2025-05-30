@@ -1,6 +1,7 @@
 package com.maitreyasave.judgementscore.features.home.start_game.ui
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
@@ -11,17 +12,38 @@ import androidx.compose.ui.unit.dp
 import com.maitreyasave.judgementscore.features.settings.add_player.data.Player
 
 @Composable
-fun PlayerScoresRow(players: List<Player>) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        players.forEach { player ->
-            Text(
-                text = "${player.emoji} ${player.name}: ${player.score}",
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center
-            )
+fun PlayerScoresRow(
+    players: List<Player>,
+    isPortrait: Boolean
+) {
+    val arrangement = Arrangement.spacedBy(12.dp)
+
+    if (isPortrait) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = arrangement
+        ) {
+            players.forEach { player ->
+                Text(
+                    text = "${player.emoji} ${player.name}: ${player.score}",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = arrangement
+        ) {
+            players.forEach { player ->
+                Text(
+                    text = "${player.emoji} ${player.name}: ${player.score}",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
+
